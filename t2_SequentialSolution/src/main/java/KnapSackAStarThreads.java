@@ -1,32 +1,52 @@
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 import static java.util.Arrays.asList;
 
-public class KnapsackAStar {
+public class KnapSackAStarThreads {
+
     static int capacity;
-    static int bestValue;
+    static volatile int bestValue;
     static boolean[] bestSelection;
     static Item[] items;
+    static Lock lock = new ReentrantLock();
+    static ExecutorService threadPool = Executors.newFixedThreadPool(10);
 
     public static int knapsackAStar(Item[] items, int capacity) {
-        KnapsackAStar.capacity = capacity;
+        KnapSackAStarThreads.capacity = capacity;
         bestValue = Integer.MIN_VALUE;
         bestSelection = new boolean[items.length];
-        KnapsackAStar.items = items;
+        KnapSackAStarThreads.items = items;
         List<Item> remainingItems = new ArrayList<>(asList(items));
         List<Item> currentItems = new ArrayList<>();
         int currentWeight = 0;
         int currentValue = 0;
 
-        astarSearch(currentItems, currentWeight, currentValue, remainingItems);
+        AtomicInteger tasksCounter = new AtomicInteger(0);
+        astarSearch(currentItems, currentWeight, currentValue, remainingItems, tasksCounter);
+
+        while (tasksCounter.get() > 0) {
+            // Wait until all tasks are completed
+        }
+        threadPool.shutdown();
 
         return bestValue;
     }
 
-    public static void astarSearch(List<Item> currentItems, int currentWeight, int currentValue, List<Item> remainingItems) {
+    public static void astarSearch(List<Item> currentItems, int currentWeight, int currentValue, List<Item> remainingItems, AtomicInteger tasksCounter) {
         if (remainingItems.isEmpty() || currentWeight == capacity) {
-            if (currentValue > bestValue) {
-                bestValue = currentValue;
-                updateBestSelection(currentItems);
+            synchronized (lock) {
+                if (currentValue > bestValue) {
+                    bestValue = currentValue;
+                    updateBestSelection(currentItems);
+                }
             }
             return;
         }
@@ -44,7 +64,11 @@ public class KnapsackAStar {
                 int nextWeight = currentWeight + item.weight;
                 int nextValue = currentValue + item.value;
                 List<Item> nextRemainingItems = new ArrayList<>(remainingItems.subList(i + 1, remainingItems.size()));
-                astarSearch(nextItems, nextWeight, nextValue, nextRemainingItems);
+                tasksCounter.incrementAndGet();
+                threadPool.submit(() -> {
+                    astarSearch(nextItems, nextWeight, nextValue, nextRemainingItems, tasksCounter);
+                    tasksCounter.decrementAndGet();
+                });
             }
         }
     }
@@ -58,12 +82,14 @@ public class KnapsackAStar {
     }
 
     public static void updateBestSelection(List<Item> selectedItems) {
-        Arrays.fill(bestSelection, false);
-        for (Item item : selectedItems) {
-            for (int i = 0; i < bestSelection.length; i++) {
-                if (item.equals(items[i])) {
-                    bestSelection[i] = true;
-                    break;
+        synchronized (lock) {
+            Arrays.fill(bestSelection, false);
+            for (Item item : selectedItems) {
+                for (int i = 0; i < bestSelection.length; i++) {
+                    if (item.equals(items[i])) {
+                        bestSelection[i] = true;
+                        break;
+                    }
                 }
             }
         }
