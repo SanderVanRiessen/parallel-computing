@@ -51,7 +51,7 @@ public class KnapSackAStarThreads {
             return;
         }
 
-        int maxPossibleValue = currentValue + heuristic(remainingItems);
+        int maxPossibleValue = currentValue + heuristic(remainingItems, currentWeight, currentValue, capacity);
         if (maxPossibleValue < bestValue) {
             return;
         }
@@ -73,12 +73,24 @@ public class KnapSackAStarThreads {
         }
     }
 
-    public static int heuristic(List<Item> remainingItems) {
-        int heuristicValue = 0;
+    public static int heuristic(List<Item> remainingItems, int currentWeight, int currentValue, int capacity) {
+        remainingItems.sort((a, b) -> Double.compare((double) b.value / b.weight, (double) a.value / a.weight));
+
+        int estimatedValue = currentValue;
+        int remainingCapacity = capacity - currentWeight;
+
         for (Item item : remainingItems) {
-            heuristicValue += item.value;
+            if (item.weight <= remainingCapacity) {
+                estimatedValue += item.value;
+                remainingCapacity -= item.weight;
+            } else {
+                // Add fraction of value based on remaining capacity
+                estimatedValue += (int) ((double) item.value / item.weight * remainingCapacity);
+                break;
+            }
         }
-        return heuristicValue;
+
+        return estimatedValue;
     }
 
     public static void updateBestSelection(List<Item> selectedItems) {
