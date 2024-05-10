@@ -1,65 +1,71 @@
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
+import java.util.concurrent.*;
 
 public class KnapSackNonRecursiveParallel {
     static int bestValue;
-    static boolean[] bestSelection;
+    static volatile boolean[] bestSelection;
     static Item[] items;
+    static int[] dp;
 
-    public static int knapsackDP(Item[] items, int capacity) {
-        int[] dp = new int[capacity + 1];
-        bestSelection = new boolean[items.length];
-
-        // Using a fixed thread pool sized to the number of available processors
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
-        for (Item item : items) {
-            executor.execute(() -> {
-                // Update the dp array in a synchronized manner
-                for (int w = capacity; w >= item.weight; w--) {
-                    synchronized (dp) {
-                        if (dp[w - item.weight] + item.value > dp[w]) {
-                            dp[w] = dp[w - item.weight] + item.value;
-                        }
-                    }
+    public static void knapsackDP(int start, int end, int itemIndex) {
+        Item item = items[itemIndex];
+        for (int w = end - 1; w >= start; w--) {
+            if (w >= item.weight) {
+                int newValue = dp[w - item.weight] + item.value;
+                if (newValue > dp[w]) {
+                    dp[w] = newValue;
                 }
-            });
+            }
         }
+    }
 
-        executor.shutdown(); // No new tasks will be accepted
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS); // Wait until all tasks are finished
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt(); // Set the interrupt flag
-            System.out.println("Thread was interrupted, failed to complete operation");
+    public static void parallelKnapsack(Item[] items, int capacity, int numThreads) throws InterruptedException {
+        ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+        dp = new int[capacity + 1];
+
+        for (int i = 0; i < items.length; i++) {
+            int finalI = i;
+            CountDownLatch latch = new CountDownLatch(numThreads);
+            for (int t = 0; t < numThreads; t++) {
+                final int start = t * (capacity + 1) / numThreads;
+                final int end = (t + 1) * (capacity + 1) / numThreads;
+                executor.submit(() -> {
+                    knapsackDP(start, end, finalI);
+                    latch.countDown();
+                });
+            }
+            latch.await();
         }
-
-        // Store the result of the knapsack
+        executor.shutdown();
         bestValue = dp[capacity];
+    }
 
-        // Reconstruct the solution
-        int w = capacity;
-        for (int i = items.length - 1; i >= 0; i--) {
-            if (bestSelection[i] && w >= items[i].weight) {
-                bestSelection[i] = true;
-                w -= items[i].weight;
+    public static void main(String[] args) throws Exception {
+        items = Item.items; // Assume items are properly initialized elsewhere
+        int capacity = 40;
+        int numThreads = 8; // Example, can be adjusted
+
+        long start = System.nanoTime();
+        parallelKnapsack(items, capacity, numThreads);
+        System.out.println("Maximum value using DP: " + bestValue);
+        System.out.println(((System.nanoTime() - start) / 1E9) + " sec.");
+
+        // Backtracking to find the selected items - simplified assumption that backtracking is sequential
+        bestSelection = new boolean[items.length];
+        for (int w = capacity; w > 0;) {
+            for (int i = 0; i < items.length; i++) {
+                if (w >= items[i].weight && dp[w] == dp[w - items[i].weight] + items[i].value) {
+                    bestSelection[i] = true;
+                    w -= items[i].weight;
+                    break;
+                }
             }
         }
 
-        return dp[capacity];
-    }
-
-    public static void main(String[] args) {
-        Item[] items = Item.items; // Assume Item.items has been initialized somewhere as static
-        int capacity = 160;
-        long start = System.nanoTime();
-        System.out.println("Maximum value using Parallel DP: " + knapsackDP(items, capacity));
-        System.out.println(((System.nanoTime() - start) / 1E9) + " sec.");
-        System.out.print("Selected items in DP approach: ");
+        System.out.println("Selected items in DP approach:");
         for (int i = 0; i < bestSelection.length; i++) {
             if (bestSelection[i]) {
-                System.out.print((i + 1) + " ");
+                System.out.println("Item " + (i + 1) + ": Weight = " + items[i].weight + ", Value = " + items[i].value);
             }
         }
     }

@@ -40,7 +40,7 @@ public class KnapSackNonRecursive {
 
     public static void main(String[] args) {
         items = Item.items; // Directly use the static items from the Item class
-        int capacity = 40; // Set the capacity of the knapsack
+        int capacity = 6500; // Set the capacity of the knapsack
         long start = System.nanoTime();
         System.out.println("Maximum value using DP: " + knapsackDP(items, capacity));
         System.out.println(((System.nanoTime() - start) / 1E9) + " sec.");
