@@ -1,6 +1,8 @@
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-public class KnapSackNonRecPar {
+public class V2KnapSackPar {
     static int bestValue;
     static boolean[] bestSelection;
     static Item[] items;
@@ -59,18 +61,24 @@ public class KnapSackNonRecPar {
 
     public static void main(String[] args) {
         items = Item.items; // Directly use the static items from the Item class
-        int numberOfThreads = 6; // You can set the number of threads here
-        int capacity = 6500; // Set the capacity of the knapsack
-        long start = System.nanoTime();
-        knapsackDP(items, capacity, numberOfThreads);
-        System.out.println("Maximum value using DP: " + bestValue);
-        System.out.println(((System.nanoTime() - start) / 1E9) + " sec.");
+        int numberOfThreads = 10; // You can set the number of threads here
+        int capacity = 500; // Set the capacity of the knapsack
+        List<Double> times = new ArrayList<>();
 
-        System.out.println("Selected items in DP approach:");
+        for (int run = 0; run < 10; run++) {
+            long start = System.nanoTime();
+            knapsackDP(items, capacity, numberOfThreads);
+            double elapsedTime = (System.nanoTime() - start) / 1E9;
+            times.add(elapsedTime);
+            System.out.println("Maximum value using DP: " + bestValue);
+            System.out.println("Run " + (run + 1) + ": " + elapsedTime + " sec.");
+        }
+ /*       System.out.println("Selected items in DP approach:");
         for (int i = 0; i < items.length; i++) {
             if (bestSelection[i]) {
                 System.out.println("Item " + (i + 1) + ": Weight = " + items[i].weight + ", Value = " + items[i].value);
             }
-        }
+        }*/
+        System.out.println("Times: " + times);
     }
 }
