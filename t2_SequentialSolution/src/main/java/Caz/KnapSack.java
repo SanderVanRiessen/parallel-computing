@@ -1,43 +1,24 @@
-public class KnapSack {
-    private int capacity;
-    private Book[] books;
+import java.util.ArrayList;
+import java.util.List;
+
+class KnapSack {
+    int capacity;
 
     public KnapSack(int capacity) {
         this.capacity = capacity;
-        this.books = new Book[];
     }
 
-    public int getTotalValue() {
-        int totalValue = 0;
-        for (Book book : this.books) {
-            totalValue += book.getValue();
+    public Solution solveSequential(List<Book> books) {
+        int[] dp = new int[capacity + 1];
+        List<Book> selectedBooks = new ArrayList<>();
+
+        for (Book book : books) {
+            for (int w = capacity; w >= book.getWeight(); w--) {
+                if (dp[w] < dp[w - book.getWeight()] + book.getValue()) {
+                    dp[w] = dp[w - book.getWeight()] + book.getValue();
+                }
+            }
         }
-        return totalValue;
-    }
-
-    public Book[] getBooks() {
-        return this.books;
-    }
-
-    public int getCapacity() {
-        return this.capacity;
-    }
-
-    public int getTotalWeight() {
-        int totalWeight = 0;
-        for (Book book : this.books) {
-            totalWeight += book.getWeight();
-        }
-        return totalWeight;
-    }
-
-    public void setBooks(Book[] books) {
-        this.books = books;
-    }
-
-    public void printBooks() {
-        for (Book book : this.books) {
-            System.out.println(book);
-        }
+        return new Solution(dp[capacity], selectedBooks, dp);
     }
 }
