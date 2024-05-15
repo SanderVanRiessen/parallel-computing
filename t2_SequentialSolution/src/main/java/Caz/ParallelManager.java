@@ -13,10 +13,10 @@ public class ParallelManager {
         this.books = books;
     }
 
-    public int execute() {
+    public Solution execute() {
         ForkJoinPool pool = ForkJoinPool.commonPool();
         KnapSackTask task = new KnapSackTask(0, books.size());
-        return pool.invoke(task).maxValue;
+        return pool.invoke(task);
     }
 
 
@@ -55,17 +55,23 @@ public class ParallelManager {
 
             for (int i = 0; i <= knapSack.capacity; i++) {
                 for (int j = 0; j <= knapSack.capacity - i; j++) {
-                    if (i + j <= knapSack.capacity && j < right.dp.length) {
+                    if (i + j <= knapSack.capacity) {
                         dp[i + j] = Math.max(dp[i + j], left.dp[i] + right.dp[j]);
                     }
                 }
             }
 
+            List<Book> selectedBooks = new ArrayList<>(left.selectedBooks);
+            selectedBooks.addAll(right.selectedBooks);
+
             int maxValue = 0;
             for (int value : dp) {
-                maxValue = Math.max(maxValue, value);
+                if (value > maxValue) {
+                    maxValue = value;
+                }
             }
-            return new Solution(maxValue, new ArrayList<>(), dp);
+
+            return new Solution(maxValue, selectedBooks, dp);
         }
 
     }

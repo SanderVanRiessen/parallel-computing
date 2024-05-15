@@ -10,4 +10,10 @@ class Solution {
         this.selectedBooks = selectedBooks;
         this.dp = dp;
     }
+
+    public void printSolution(){
+        for(Book book : selectedBooks){
+           book.printBook();
+        }
+    }
 }

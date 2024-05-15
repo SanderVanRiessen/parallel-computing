@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 
 class Main {
@@ -11,13 +12,15 @@ class Main {
         long endTime = System.currentTimeMillis();
         System.out.println("Sequential solve took " + (endTime - startTime) + " ms");
         System.out.println("Maximum Profit (Sequential): " + resultSequential.maxValue);
+        resultSequential.printSolution();
 
         System.out.println("Starting Parallel Solve...");
         startTime = System.currentTimeMillis();
         ParallelManager manager = new ParallelManager(knapSack, books);
-        int maxProfitParallel = manager.execute();
+        Solution maxProfitParallel = manager.execute();
         endTime = System.currentTimeMillis();
         System.out.println("Parallel solve took " + (endTime - startTime) + " ms");
-        System.out.println("Maximum Profit (Parallel): " + maxProfitParallel);
+        System.out.println("Maximum Profit (Parallel): " + maxProfitParallel.maxValue);
+        maxProfitParallel.printSolution();
     }
 }

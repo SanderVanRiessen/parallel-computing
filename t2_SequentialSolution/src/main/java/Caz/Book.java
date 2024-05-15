@@ -29,4 +29,8 @@ class Book {
         }
         return books;
     }
+
+    public void printBook(){
+        System.out.println("Book weight: " + getWeight() + ", value: " + getValue());
+    }
 }
