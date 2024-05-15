@@ -1,5 +1,3 @@
-package Caz;
-
 import java.util.List;
 
 class Solution {

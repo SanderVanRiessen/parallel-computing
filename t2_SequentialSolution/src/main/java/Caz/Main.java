@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.List;
 
 class Main {
@@ -12,7 +11,6 @@ class Main {
         long endTime = System.currentTimeMillis();
         System.out.println("Sequential solve took " + (endTime - startTime) + " ms");
         System.out.println("Maximum Profit (Sequential): " + resultSequential.maxValue);
-        resultSequential.printSolution();
 
         System.out.println("Starting Parallel Solve...");
         startTime = System.currentTimeMillis();
