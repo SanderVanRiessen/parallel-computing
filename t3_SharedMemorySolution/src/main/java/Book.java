@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,4 +36,26 @@ class Book {
     public void printBook(){
         System.out.println("Book weight: " + getWeight() + ", value: " + getValue());
     }
+
+    public static List<Book> generateRandomBooks() {
+        List<Book> books = new ArrayList<>();
+
+        try {
+            String filePath = System.getProperty("user.dir") + "/resources/books_data.txt";
+            BufferedReader br = new BufferedReader(new FileReader(filePath));
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.substring(line.indexOf('(')+ 1, line.indexOf(')')).split(", ");
+                int firstArg = Integer.parseInt(parts[0]);
+                int secondArg = Integer.parseInt(parts[1]);
+
+                books.add(new Book(firstArg, secondArg));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return books;
+    }
+
 }
