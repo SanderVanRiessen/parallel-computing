@@ -1,10 +1,8 @@
-import com.fasterxml.jackson.core.JsonProcessingException;
 
-import javax.jms.JMSException;
 import java.util.List;
 
 public class Main {
-    public static void main(String[] args) throws JMSException, JsonProcessingException {
+    public static void main(String[] args) {
         List<Book> books = Book.generateRandomBooks(100000, 100, 100);
 //        List<Book> books = Book.generateRandomBooks();
         KnapSack knapSack = new KnapSack(10000);
