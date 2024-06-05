@@ -58,8 +58,10 @@ public class RmiMain {
 
         shutdownWorkers(workers);
 
-        System.out.println("book size: " + master.getAccumulatedResult().selectedBooks.size());
-        System.out.println("max value: " + master.getAccumulatedResult().maxValue);
+        System.out.printf("%d workers have completed %d tasks with a maximum value of %d\n",
+                numWorkers,
+                master.getCompletedTasks(),
+                master.getAccumulatedResult().maxValue);
 
         UnicastRemoteObject.unexportObject(master, true);
     }

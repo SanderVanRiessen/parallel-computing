@@ -32,6 +32,10 @@ public class Master extends UnicastRemoteObject implements MasterInterface<Solut
         return accumulatedResult;
     }
 
+    public int getCompletedTasks() {
+        return this.numTasksGiven;
+    }
+
     @Override
     synchronized public Supplier<Solution> getExecution(int workerId) {
         int remainingTasksToGive = this.tasks - this.numTasksGiven;
