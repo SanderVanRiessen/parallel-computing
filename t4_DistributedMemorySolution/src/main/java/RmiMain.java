@@ -13,9 +13,10 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.function.Supplier;
 
+
 public class RmiMain {
     private static final int SERVICE_PORT = 49991;
-    static final String SERVICE_NAME = "/knapsackProblem";
+    static String serviceName = "/knapsackProblem";
 
     public static void main(String[] args) throws IOException, InterruptedException, NotBoundException {
         List<Book> books = Book.generateRandomBooks();
@@ -26,6 +27,9 @@ public class RmiMain {
             if (args[i].equals("--serviceHost")) {
                 i++;
                 serviceHost = args[i];
+            } else if (args[i].equals("--serviceName")) {
+              i++;
+              serviceName = args[i];
             } else if (args[i].equals("--verbosityLevel")) {
                 i++;
                 Timer.verbosityLevel = Integer.valueOf(args[i]);
@@ -33,7 +37,6 @@ public class RmiMain {
             else if (args[i].equals("--workerId")) {
                 i++;
                 int workerId = Integer.valueOf(args[i]);
-
                 // launch the worker
                 workerMain(workerId, serviceHost);
                 return;
@@ -55,9 +58,9 @@ public class RmiMain {
                 numWorkers, serviceHost);
 
         Process[] workers = launchWorkersAtLocalHost(numWorkers, serviceHost);
-
+        System.out.println("2");
         shutdownWorkers(workers);
-
+        System.out.println("2");
         System.out.printf("%d workers have completed %d tasks with a maximum value of %d\n",
                 numWorkers,
                 master.getCompletedTasks(),
@@ -69,7 +72,7 @@ public class RmiMain {
     static void workerMain(int workerId, String serviceHost) throws RemoteException, NotBoundException {
         Timer.echo(2, "Worker-%d is up and running\n", workerId);
         Registry registry = LocateRegistry.getRegistry(serviceHost, SERVICE_PORT);
-        MasterInterface<Solution> masterService = (MasterInterface) registry.lookup("//" + serviceHost + SERVICE_NAME);
+        MasterInterface<Solution> masterService = (MasterInterface) registry.lookup("//" + serviceHost + serviceName);
 
         int tasksCompleted = 0;
 
@@ -99,7 +102,8 @@ public class RmiMain {
                     javaBin, "-classpath", classPath, RmiMain.class.getCanonicalName(),
                     "--verbosityLevel", String.valueOf(Timer.verbosityLevel),
                     "--serviceHost", serviceHost,
-                    "--workerId", String.valueOf(childId)
+                    "--workerId", String.valueOf(childId),
+                    "--serviceName", String.valueOf(serviceName)
             );
 
             workers[childId] = child.inheritIO().start();
@@ -112,7 +116,7 @@ public class RmiMain {
         Timer.start();
 
         Registry registry = LocateRegistry.createRegistry(SERVICE_PORT);
-        registry.rebind("//" + serviceHost + SERVICE_NAME, master);
+        registry.rebind("//" + serviceHost + serviceName, master);
 
         Timer.measure(2, "Creation of registry has completed\n");
     }

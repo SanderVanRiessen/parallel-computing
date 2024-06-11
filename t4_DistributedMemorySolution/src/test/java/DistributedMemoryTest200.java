@@ -1,30 +1,26 @@
 import common.Timer;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
-public class DistributedMemoryTest {
+public class DistributedMemoryTest200 {
 
     private List<Book> books;
     private static final int RUNS = 10;
     private static List<String> results;
     private static int servicePort = 49991;
-    static String serviceName = "/knapsackProblem";
+    static String serviceName = "/knapsackProblem1";
 
     @Before
     public void setUp() {
@@ -36,53 +32,8 @@ public class DistributedMemoryTest {
     }
 
     @Test
-    public void testKnapSackSize100() throws Exception {
-        runDistributedMemoryTest(100);
-    }
-
-    @Test
     public void testKnapSackSize200() throws Exception {
         runDistributedMemoryTest(200);
-    }
-
-    @Test
-    public void testKnapSackSize400() throws Exception {
-        runDistributedMemoryTest(400);
-    }
-
-    @Test
-    public void testKnapSackSize800() throws Exception {
-        runDistributedMemoryTest(800);
-    }
-
-    @Test
-    public void testKnapSackSize1600() throws Exception {
-        runDistributedMemoryTest(1600);
-    }
-
-    @Test
-    public void testKnapSackSize3200() throws Exception {
-        runDistributedMemoryTest(3200);
-    }
-
-    @Test
-    public void testKnapSackSize6400() throws Exception {
-        runDistributedMemoryTest(6400);
-    }
-
-    @Test
-    public void testKnapSackSize12800() throws Exception {
-        runDistributedMemoryTest(12800);
-    }
-
-    @Test
-    public void testKnapSackSize25600() throws Exception {
-        runDistributedMemoryTest(25600);
-    }
-
-    @Test
-    public void testKnapSackSize51200() throws Exception {
-        runDistributedMemoryTest(200000);
     }
 
     @After
@@ -100,7 +51,7 @@ public class DistributedMemoryTest {
 
     private void runDistributedMemoryTest(int size) throws Exception {
         KnapSack knapSack = new KnapSack(size);
-        String serviceHost = RmiMain.getExternalIPAddress();
+        String serviceHost = getExternalIPAddress();
         System.out.println(servicePort);
         System.out.println(serviceName);
 
@@ -137,7 +88,8 @@ public class DistributedMemoryTest {
                     javaBin, "-classpath", classPath, RmiMain.class.getCanonicalName(),
                     "--verbosityLevel", String.valueOf(Timer.verbosityLevel),
                     "--serviceHost", serviceHost,
-                    "--workerId", String.valueOf(childId)
+                    "--workerId", String.valueOf(childId),
+                    "--serviceName", String.valueOf(serviceName)
             );
 
             workers[childId] = child.inheritIO().start();
