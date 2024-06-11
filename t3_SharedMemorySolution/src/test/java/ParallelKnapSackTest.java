@@ -99,7 +99,7 @@ public class ParallelKnapSackTest {
     @AfterClass
     public static void tearDown() throws IOException {
         String projectRoot = System.getProperty("user.dir");
-        try (FileWriter writer = new FileWriter(projectRoot + "/knapsack_benchmark_results.csv")) {
+        try (FileWriter writer = new FileWriter(projectRoot + "/knapsack_benchmark_parallel.csv")) {
             for (String result : results) {
                 writer.write(result + "\n");
             }

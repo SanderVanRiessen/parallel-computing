@@ -26,6 +26,7 @@ public class Master extends UnicastRemoteObject implements MasterInterface<Solut
         this.start = 0;
         this.tasks = tasks;
         this.growthSize = books.size() / tasks;
+        this.accumulatedResult = new Solution(0, new ArrayList<>(), new int[knapSack.capacity + 1]);
     }
 
     public Solution getAccumulatedResult() {

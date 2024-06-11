@@ -15,11 +15,11 @@ import java.util.function.Supplier;
 
 public class RmiMain {
     private static final int SERVICE_PORT = 49991;
-    private static final String SERVICE_NAME = "/knapsackProblem";
+    static final String SERVICE_NAME = "/knapsackProblem";
 
     public static void main(String[] args) throws IOException, InterruptedException, NotBoundException {
         List<Book> books = Book.generateRandomBooks();
-        KnapSack knapSack = new KnapSack(10000);
+        KnapSack knapSack = new KnapSack(100);
         String serviceHost = getExternalIPAddress();
 
         for (int i = 0; i < args.length; i++) {
@@ -66,7 +66,7 @@ public class RmiMain {
         UnicastRemoteObject.unexportObject(master, true);
     }
 
-    private static void workerMain(int workerId, String serviceHost) throws RemoteException, NotBoundException {
+    static void workerMain(int workerId, String serviceHost) throws RemoteException, NotBoundException {
         Timer.echo(2, "Worker-%d is up and running\n", workerId);
         Registry registry = LocateRegistry.getRegistry(serviceHost, SERVICE_PORT);
         MasterInterface<Solution> masterService = (MasterInterface) registry.lookup("//" + serviceHost + SERVICE_NAME);
@@ -85,7 +85,7 @@ public class RmiMain {
         Timer.echo(-1, "Worker-%d has completed %d tasks\n", workerId, tasksCompleted);
     }
 
-    private static Process[] launchWorkersAtLocalHost(int numWorkers, String serviceHost) throws IOException {
+    static Process[] launchWorkersAtLocalHost(int numWorkers, String serviceHost) throws IOException {
         Timer.start();
 
         Process[] workers = new Process[numWorkers];
@@ -108,7 +108,7 @@ public class RmiMain {
         return workers;
     }
 
-    private static void registerMaster(MasterInterface master, String serviceHost) throws RemoteException {
+    static void registerMaster(MasterInterface master, String serviceHost) throws RemoteException {
         Timer.start();
 
         Registry registry = LocateRegistry.createRegistry(SERVICE_PORT);
@@ -117,13 +117,13 @@ public class RmiMain {
         Timer.measure(2, "Creation of registry has completed\n");
     }
 
-    private static String getExternalIPAddress() throws UnknownHostException {
+    static String getExternalIPAddress() throws UnknownHostException {
         String ipa = "localhost";
         ipa = InetAddress.getLocalHost().getHostAddress().toString();
         return ipa;
     }
 
-    private static void shutdownWorkers(Process[] workers) throws InterruptedException {
+    static void shutdownWorkers(Process[] workers) throws InterruptedException {
         Timer.echo(1, "Waiting for %d workers to complete\n", workers.length);
         for (int childId = 0; childId < workers.length; childId++) {
             workers[childId].waitFor();
