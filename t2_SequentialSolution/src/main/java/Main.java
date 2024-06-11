@@ -2,8 +2,8 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        List<Book> books = Book.generateRandomBooks(100000, 100, 100);
-//        List<Book> books = Book.generateRandomBooks();
+ //       List<Book> books = Book.generateRandomBooks(100000, 100, 100);
+        List<Book> books = Book.generateRandomBooks();
         KnapSack knapSack = new KnapSack(10000);
 
         System.out.println("Starting Sequential Solve...");
