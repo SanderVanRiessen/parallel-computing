@@ -6,19 +6,25 @@ import java.util.concurrent.RecursiveTask;
 public class ParallelManager {
     private KnapSack knapSack;
     private List<Book> books;
+    private ForkJoinPool pool;
     private static final int FACTOR = 2;
 
     public ParallelManager(KnapSack knapSack, List<Book> books) {
         this.knapSack = knapSack;
         this.books = books;
+        this.pool = ForkJoinPool.commonPool();
+    }
+
+    public ParallelManager(KnapSack knapSack, List<Book> books, int threads) {
+        this.knapSack = knapSack;
+        this.books = books;
+        this.pool = new ForkJoinPool(threads);
     }
 
     public Solution execute() {
-        ForkJoinPool pool = ForkJoinPool.commonPool();
         KnapSackTask task = new KnapSackTask(0, books.size());
         return pool.invoke(task);
     }
-
 
     private class KnapSackTask extends RecursiveTask<Solution> {
         private int start;
