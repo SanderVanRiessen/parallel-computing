@@ -1,3 +1,5 @@
+package main.java;
+
 import java.rmi.RemoteException;
 
 public class MessengerServiceImpl implements MessengerService {

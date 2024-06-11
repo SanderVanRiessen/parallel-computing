@@ -1,3 +1,5 @@
+package main.java;
+
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.registry.LocateRegistry;
@@ -6,7 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Client {
-    private static final int[] PORTS = new int[]{49990, 49991, 49992, 49993};
+
+    private static final int[] PORTS = new int[]{49994, 49994, 49994, 49994};
+
+    private static final String[] IP = new String[]{"10.1.5.28", "10.1.5.29", "10.1.1.41", "10.1.3.6"};
 
     private static final String SERVICE_NAME = "/knapsackProblem";
 
@@ -29,8 +34,7 @@ public class Client {
                 List<Book> subList = new ArrayList<>(books.subList(start, end));
                 start = end;
                 end += booksPerServer;
-                System.out.println("Connecting to server " + i + " with " + subList.size() + " books");
-                Solution subSolution = connectToServer(serviceHost, PORTS[i], subList, knapSack);
+                Solution subSolution = connectToServer(IP[i], PORTS[i], subList, knapSack);
                 solutions.add(subSolution);
             }
 
@@ -42,7 +46,7 @@ public class Client {
             }
             System.out.println("Combined solution: " + combineSubSolution.maxValue);
 
-            Solution finalSolution = connectToServer(serviceHost, PORTS[1], combineSubSolution.selectedBooks, knapSack);
+            Solution finalSolution = connectToServer(IP[0], PORTS[0], combineSubSolution.selectedBooks, knapSack);
             System.out.println("final solution: " + finalSolution.maxValue);
 
             System.out.println( "The return value from the server is: " + finalSolution.maxValue );
@@ -60,8 +64,9 @@ public class Client {
 
     private static Solution connectToServer(String serviceHost, int port, List<Book> books, KnapSack knapSack) {
         try {
+            System.out.println(serviceHost);
             Registry registry = LocateRegistry.getRegistry(serviceHost, port);
-            ProblemService<Solution> comp = (ProblemService<Solution>) registry.lookup("//" + serviceHost + SERVICE_NAME);
+            ProblemService<Solution> comp = (ProblemService<Solution>) registry.lookup(SERVICE_NAME);
             System.out.println("Connected to server " + serviceHost + " on port " + port);
             Solution returnVal = comp.executeProblem(knapSack, books);
             System.out.println("The return value from the server is: " + returnVal.maxValue);
@@ -72,4 +77,5 @@ public class Client {
         }
         return null;
     }
+
 }
