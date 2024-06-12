@@ -11,15 +11,10 @@ public class ProblemServiceImpl implements ProblemService<Solution> {
         System.out.println("start");
         System.out.println(new SimpleDateFormat("yyyyMMdd_HHmmss").format(System.currentTimeMillis()));
         Solution maxProfitParallel = knapSack.solveSequential(books);
-//        Solution maxProfitParallel = manager.execute();
+//        main.java.Solution maxProfitParallel = manager.execute();
         System.out.println(new SimpleDateFormat("yyyyMMdd_HHmmss").format(System.currentTimeMillis()));
         System.out.println("end");
 
         return maxProfitParallel;
-    }
-
-    @Override
-    public Solution processResults() throws RemoteException {
-        return null;
     }
 }

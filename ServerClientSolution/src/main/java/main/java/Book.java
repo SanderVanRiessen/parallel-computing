@@ -37,7 +37,7 @@ class Book implements Serializable {
     }
 
     public void printBook(){
-        System.out.println("Book weight: " + getWeight() + ", value: " + getValue());
+        System.out.println("main.java.Book weight: " + getWeight() + ", value: " + getValue());
     }
 
     public static List<Book> generateRandomBooks() {

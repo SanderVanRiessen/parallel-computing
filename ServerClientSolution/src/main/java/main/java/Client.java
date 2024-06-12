@@ -9,9 +9,9 @@ import java.util.List;
 
 public class Client {
 
-    private static final int[] PORTS = new int[]{49994, 49994, 49994, 49994};
+    private static final int[] PORTS = new int[]{49994, 49994};
 
-    private static final String[] IP = new String[]{"10.1.5.28", "10.1.5.29", "10.1.1.41", "10.1.3.6"};
+    private static final String[] IP = new String[]{"4.231.252.64", "20.234.66.216"};
 
     private static final String SERVICE_NAME = "/knapsackProblem";
 
