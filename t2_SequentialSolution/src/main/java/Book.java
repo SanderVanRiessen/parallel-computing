@@ -42,7 +42,7 @@ class Book {
         List<Book> books = new ArrayList<>();
 
         try {
-            String filePath = System.getProperty("user.dir") + "/resources/books_data.txt";
+            String filePath = System.getProperty("user.dir") + "/resources/books_data100k.txt";
             BufferedReader br = new BufferedReader(new FileReader(filePath));
             String line;
             while ((line = br.readLine()) != null) {

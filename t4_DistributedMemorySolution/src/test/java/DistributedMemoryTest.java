@@ -21,18 +21,25 @@ import java.util.function.Supplier;
 public class DistributedMemoryTest {
 
     private List<Book> books;
-    private static final int RUNS = 10;
     private static List<String> results;
     private static int servicePort = 49991;
     static String serviceName = "/knapsackProblem";
+
 
     @Before
     public void setUp() {
         books = Book.generateRandomBooks();
         if (results == null) {
             results = new ArrayList<>();
-            results.add("KnapsackSize,Nodes,AverageTime(ms),MaxProfit");
+            if (!isFileHeaderPresent("knapsack_benchmark_distributed1k.csv")) {
+                results.add("KnapsackSize,Nodes,AverageTime(ms),MaxProfit");
+            }
         }
+    }
+
+    private boolean isFileHeaderPresent(String filename) {
+        File file = new File(System.getProperty("user.dir") + File.separator + filename);
+        return file.exists() && file.length() > 0;
     }
 
     @Test
@@ -79,10 +86,10 @@ public class DistributedMemoryTest {
     public void testKnapSackSize25600() throws Exception {
         runDistributedMemoryTest(25600);
     }
-
+    private static final int NODES = 3;
     @Test
     public void testKnapSackSize51200() throws Exception {
-        runDistributedMemoryTest(200000);
+        runDistributedMemoryTest(51200);
     }
 
     @After
@@ -100,26 +107,22 @@ public class DistributedMemoryTest {
 
     private void runDistributedMemoryTest(int size) throws Exception {
         KnapSack knapSack = new KnapSack(size);
-        String serviceHost = RmiMain.getExternalIPAddress();
+        String serviceHost = getExternalIPAddress();
         System.out.println(servicePort);
         System.out.println(serviceName);
 
-        int nodes = 10;
-
-        Master master = new Master(books, knapSack, nodes);
+        Master master = new Master(books, knapSack, NODES);
         registerMaster(master, serviceHost);
         Timer.echo(-1, "\nLaunching %d workers at %s to solve the knapsack problem\n",
-                nodes, serviceHost);
+                NODES, serviceHost);
 
-        Process[] workers = launchWorkersAtLocalHost(nodes, serviceHost);
-        System.out.println("1");
-        shutdownWorkers(workers);
-        System.out.println("1");
+        Process[] workers = launchWorkersAtLocalHost(NODES, serviceHost);
+        long time = shutdownWorkers(workers);
         System.out.printf("%d workers have completed %d tasks with a maximum value of %d\n",
-                nodes,
+                NODES,
                 master.getCompletedTasks(),
                 master.getAccumulatedResult().maxValue);
-
+        results.add(size + "," + NODES + "," + time + "," + master.getAccumulatedResult().maxValue);
     }
 
 
@@ -161,12 +164,22 @@ public class DistributedMemoryTest {
         return ipa;
     }
 
-    static void shutdownWorkers(Process[] workers) throws InterruptedException {
+    static long shutdownWorkers(Process[] workers) throws InterruptedException {
         System.out.println("workers shutdown");
         Timer.echo(1, "Waiting for %d workers to complete\n", workers.length);
         for (int childId = 0; childId < workers.length; childId++) {
             workers[childId].waitFor();
         }
-        Timer.measure(-1, "All worker processes have finished\n");
+        return Timer.measure(-1, "All worker processes have finished\n");
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        String projectRoot = System.getProperty("user.dir");
+        try (FileWriter writer = new FileWriter(projectRoot + "/knapsack_benchmark_distributed100k.csv", true)) {
+            for (String result : results) {
+                writer.write(result + "\n");
+            }
+        }
     }
 }

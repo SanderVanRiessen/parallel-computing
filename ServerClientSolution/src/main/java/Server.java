@@ -27,6 +27,7 @@ public class Server {
 
         try {
             String serviceHost = getExternalIPAddress();
+//            String serviceHost = "84.104.44.122";
             System.setProperty("java.rmi.server.hostname", serviceHost);
             ProblemService<Solution> stub = (ProblemService<Solution>) UnicastRemoteObject.exportObject(implementation, 0);
             Registry registry = LocateRegistry.createRegistry(SERVICE_PORT);
@@ -34,9 +35,13 @@ public class Server {
             System.out.println("Bound to " + serviceHost + ":" + SERVICE_PORT);
             System.out.println("Server will wait forever for messages.");
             printRegistryInformation(registry);
-        } catch (RemoteException | UnknownHostException | SocketException ex) {
+        } catch (RemoteException ex) {
             ex.printStackTrace();
             return;
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -1,3 +1,4 @@
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -93,8 +94,8 @@ public class BenchmarkTest {
         System.out.println("Average Time taken (Sequential): " + averageTime + " ms, Max Profit: " + maxProfit);
     }
 
-    @AfterClass
-    public static void tearDown() throws IOException {
+    @After
+    public void tearDown() throws IOException {
         String projectRoot = System.getProperty("user.dir");
         try (FileWriter writer = new FileWriter(projectRoot + "/knapsack_sequential_benchmark_results.csv")) {
             for (String result : results) {
