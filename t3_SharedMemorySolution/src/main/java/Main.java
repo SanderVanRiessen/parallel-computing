@@ -13,7 +13,7 @@ public class Main {
 
         System.out.println("Starting Parallel Solve");
         long startTime = System.currentTimeMillis();
-        ParallelManager manager = new ParallelManager(knapSack, books);
+        ParallelManager manager = new ParallelManager(knapSack, books, threads);
         Solution maxProfitParallel = manager.execute();
         long endTime = System.currentTimeMillis();
         System.out.println("Parallel solve took " + (endTime - startTime) + " ms");

@@ -1,4 +1,6 @@
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveTask;
@@ -22,37 +24,57 @@ public class ParallelManager {
     }
 
     public Solution execute() {
-        KnapSackTask task = new KnapSackTask(0, books.size());
+        KnapSackTask task = new KnapSackTask(0, books.size(), books);
         return pool.invoke(task);
     }
 
     private class KnapSackTask extends RecursiveTask<Solution> {
         private int start;
         private int end;
+        private List<Book> books;
         private int idealGranularity;
 
-        KnapSackTask(int start, int end) {
+        KnapSackTask(int start, int end, List<Book> books) {
             this.start = start;
             this.end = end;
+            this.books = books;
             this.idealGranularity = Math.max(books.size() / (ForkJoinPool.getCommonPoolParallelism() * FACTOR), 10);
         }
 
         @Override
         protected Solution compute() {
-            int length = end - start;
-            if (length <= idealGranularity) {
-                return knapSack.solveSequential(books.subList(start, end));
-            } else {
-                int mid = start + length / 2;
-                KnapSackTask leftTask = new KnapSackTask(start, mid);
-                KnapSackTask rightTask = new KnapSackTask(mid, end);
+            Deque<KnapSackTask> taskStack = new ArrayDeque<>();
+            Deque<Solution> solutionStack = new ArrayDeque<>();
 
-                leftTask.fork();
-                Solution rightSolution = rightTask.compute();
-                Solution leftSolution = leftTask.join();
+            taskStack.push(this);
 
-                return combineSolutions(leftSolution, rightSolution);
+            while (!taskStack.isEmpty()) {
+                KnapSackTask currentTask = taskStack.pop();
+                int length = currentTask.end - currentTask.start;
+
+                if (length <= currentTask.idealGranularity) {
+                    Solution result = knapSack.solveSequential(currentTask.books.subList(currentTask.start, currentTask.end));
+                    solutionStack.push(result);
+                } else {
+                    int mid = currentTask.start + length / 2;
+                    KnapSackTask leftTask = new KnapSackTask(currentTask.start, mid, currentTask.books);
+                    KnapSackTask rightTask = new KnapSackTask(mid, currentTask.end, currentTask.books);
+
+                    // Push right task first so that left task is processed first (LIFO order)
+                    taskStack.push(rightTask);
+                    taskStack.push(leftTask);
+                }
+
+                // Combine solutions if the stack contains more than one solution
+                while (solutionStack.size() > 1) {
+                    Solution rightSolution = solutionStack.pop();
+                    Solution leftSolution = solutionStack.pop();
+                    Solution combinedSolution = combineSolutions(leftSolution, rightSolution);
+                    solutionStack.push(combinedSolution);
+                }
             }
+
+            return solutionStack.pop();
         }
 
         private Solution combineSolutions(Solution left, Solution right) {
@@ -79,6 +101,5 @@ public class ParallelManager {
 
             return new Solution(maxValue, selectedBooks, dp);
         }
-
     }
 }
