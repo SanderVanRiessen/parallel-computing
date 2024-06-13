@@ -1,7 +1,9 @@
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,14 +15,23 @@ public class ParallelKnapSackTest {
     private static final int RUNS = 10;
     private static List<String> results;
 
+
     @Before
     public void setUp() {
         books = Book.generateRandomBooks();
         if (results == null) {
             results = new ArrayList<>();
-            results.add("KnapsackSize,Threads,AverageTime(ms),MaxProfit");
+            if (!isFileHeaderPresent("knapsack_benchmark_parallel100kbooks.csv")) {
+                results.add("KnapsackSize,threads,AverageTime(ms),MaxProfit");
+            }
         }
     }
+
+    private boolean isFileHeaderPresent(String filename) {
+        File file = new File(System.getProperty("user.dir") + File.separator + filename);
+        return file.exists() && file.length() > 0;
+    }
+
 
     @Test
     public void testKnapSackSize100() {
@@ -96,10 +107,10 @@ public class ParallelKnapSackTest {
         }
     }
 
-    @AfterClass
-    public static void tearDown() throws IOException {
+    @After
+    public void tearDown() throws IOException {
         String projectRoot = System.getProperty("user.dir");
-        try (FileWriter writer = new FileWriter(projectRoot + "/knapsack_benchmark_parallel.csv")) {
+        try (FileWriter writer = new FileWriter(projectRoot + "/knapsack_benchmark_parallel100kbooks.csv", true)) {
             for (String result : results) {
                 writer.write(result + "\n");
             }
