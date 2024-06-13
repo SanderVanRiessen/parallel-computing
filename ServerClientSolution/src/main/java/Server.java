@@ -1,21 +1,17 @@
-package main.java;
+import common.Timer;
 
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-
 import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.Enumeration;
 
 public class Server {
     private static int SERVICE_PORT = 49994;
     private static final String SERVICE_NAME = "/knapsackProblem";
-
     public static void main(String[] args) {
+        // First, create the real object which will do the requested function.
         ProblemServiceImpl implementation = new ProblemServiceImpl();
 
         for (int i = 0; i < args.length; i++) {
@@ -26,57 +22,24 @@ public class Server {
         }
 
         try {
+            // Export the object.
             String serviceHost = getExternalIPAddress();
-//            String serviceHost = "84.104.44.122";
-            System.setProperty("java.rmi.server.hostname", serviceHost);
             ProblemService<Solution> stub = (ProblemService<Solution>) UnicastRemoteObject.exportObject(implementation, 0);
             Registry registry = LocateRegistry.createRegistry(SERVICE_PORT);
-            registry.rebind(SERVICE_NAME, stub); // Ensure service name is consistent
-            System.out.println("Bound to " + serviceHost + ":" + SERVICE_PORT);
-            System.out.println("Server will wait forever for messages.");
-            printRegistryInformation(registry);
-        } catch (RemoteException ex) {
+            registry.rebind("//" + serviceHost + SERVICE_NAME, stub);
+
+        } catch (RemoteException | UnknownHostException ex) {
             ex.printStackTrace();
             return;
-        } catch (SocketException e) {
-            throw new RuntimeException(e);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException(e);
         }
+        System.out.println( "Bound!" );
+        System.out.println( "Server will wait forever for messages." );
+
     }
-
-    private static String getExternalIPAddress() throws UnknownHostException, SocketException {
-        Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-        while (interfaces.hasMoreElements()) {
-            NetworkInterface iface = interfaces.nextElement();
-            // Filters out 127.0.0.1 and inactive interfaces
-            if (iface.isLoopback() || !iface.isUp()) {
-                continue;
-            }
-
-            Enumeration<InetAddress> addresses = iface.getInetAddresses();
-            while (addresses.hasMoreElements()) {
-                InetAddress addr = addresses.nextElement();
-                // Filters out IPv6 addresses
-                if (addr.isLoopbackAddress() || addr.getHostAddress().contains(":")) {
-                    continue;
-                }
-                return addr.getHostAddress();
-            }
-        }
-        throw new UnknownHostException("No non-loopback address found");
-    }
-
-    private static void printRegistryInformation(Registry registry) {
-        try {
-            String[] boundNames = registry.list();
-            System.out.println("Currently bound names in the registry:");
-            for (String name : boundNames) {
-                System.out.println(name);
-            }
-        } catch (RemoteException e) {
-            System.err.println("Failed to retrieve registry information:");
-            e.printStackTrace();
-        }
+    private static String getExternalIPAddress() throws UnknownHostException {
+        String ipa = "localhost";
+        ipa = InetAddress.getLocalHost().getHostAddress().toString();
+        return ipa;
     }
 }
+
