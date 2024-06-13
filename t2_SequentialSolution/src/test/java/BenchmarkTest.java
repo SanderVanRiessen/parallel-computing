@@ -85,8 +85,6 @@ public class BenchmarkTest {
             long endTime = System.currentTimeMillis();
             totalTime += (endTime - startTime);
             maxProfit = solution.maxValue;
-
-            System.gc();
         }
         long averageTime = totalTime / RUNS;
         results.add(size + "," + averageTime + "," + maxProfit);

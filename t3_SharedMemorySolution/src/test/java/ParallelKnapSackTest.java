@@ -97,8 +97,6 @@ public class ParallelKnapSackTest {
                 long endTime = System.currentTimeMillis();
                 totalTime += (endTime - startTime);
                 maxProfit = solution.maxValue;
-
-                System.gc();
             }
             long averageTime = totalTime / RUNS;
             results.add(size + "," + threads + "," + averageTime + "," + maxProfit);
