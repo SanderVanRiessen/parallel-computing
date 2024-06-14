@@ -20,7 +20,7 @@ public class RmiMain {
 
     public static void main(String[] args) throws IOException, InterruptedException, NotBoundException {
         List<Book> books = Book.generateRandomBooks();
-        KnapSack knapSack = new KnapSack(100);
+        KnapSack knapSack = new KnapSack(200);
         String serviceHost = getExternalIPAddress();
 
         for (int i = 0; i < args.length; i++) {

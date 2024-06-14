@@ -7,7 +7,7 @@ public class Main {
     public static void main(String[] args) {
 //        List<Book> books = Book.generateRandomBooks(100000, 100, 100);
         List<Book> books = Book.generateRandomBooks();
-        KnapSack knapSack = new KnapSack(51200);
+        KnapSack knapSack = new KnapSack(12800);
 
         int threads = 10;
 

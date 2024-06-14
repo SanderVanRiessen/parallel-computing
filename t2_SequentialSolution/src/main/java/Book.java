@@ -7,6 +7,7 @@ import java.util.List;
 class Book {
     private int weight;
     private int value;
+    private static final String bookFilePath = "/resources/books_data1k.txt";
 
     public Book(int weight, int value) {
         this.weight = weight;
@@ -42,7 +43,7 @@ class Book {
         List<Book> books = new ArrayList<>();
 
         try {
-            String filePath = System.getProperty("user.dir") + "/resources/books_data100k.txt";
+            String filePath = System.getProperty("user.dir") + bookFilePath;
             BufferedReader br = new BufferedReader(new FileReader(filePath));
             String line;
             while ((line = br.readLine()) != null) {

@@ -29,7 +29,48 @@ You will find the results in the terminal.
 
 You will find the results in the terminal.
 
-## How to run 
+## How to run benchmarks 
+
+### t2_SequentialSoltuion
+
+- Go to the following directory `t2_SequentialSolution/src/main/java`
+- Open the `Book` class
+  - Change the `bookFilePath` String to the desired amount of books resource file.
+- Go to the following directory `t3_SequentialSolution/src/test/java`
+- Open the `SequentialBenchmarkTest` class
+- Change `fileName` to your own choice
+- to start the benchmark:
+  - Run `SequentialBenchmarkTest` for a full benchmark run
+  - Run `testKnapSackSizeXXX` for a single benchmark run 
+
+The results will be shown in the terminal and be saved in the csv file
+
+### t3_SharedMemorySolution
+
+- Go to the following directory `t3_SharedMemorySolution/src/main/java`
+- Open the `Book` class
+  - Change the `bookFilePath` String to the desired amount of books resource file.
+- Go to the following directory `t3_SharedMemorySolution/src/test/java`
+- Open the `ParallelBenchmarkTest` class
+- Change `fileName` to your own choice
+- to start the benchmark:
+  - Run `ParallelBenchmarkTest` for a full benchmark run
+  - Run `testKnapSackSizeXXX` for a single benchmark run
+
+The results will be shown in the terminal and be saved in the csv file
+
+### t4_DistributedMemorySolution
+
+- Go to the following directory `t4_DistributedMemorySolution/src/main/java`
+- Open the `Book` class
+  - Change the `bookFilePath` String to the desired amount of books resource file.
+- Go to the following directory `t3_DistributedMemorySolution/src/test/java`
+- Open the `DistributedBenchmarkTest` class
+- Change `fileName` to your own choice
+- to start the benchmark:
+  - Only run the tests named `TestKnapSackSize` + `Number`
+
+The results will be shown in the terminal and be saved in the csv file
 
 ## How to run ServerClientSolution
 
