@@ -27,7 +27,6 @@ public class Server {
 
         try {
             String serviceHost = getExternalIPAddress();
-//            String serviceHost = "84.104.44.122";
             System.setProperty("java.rmi.server.hostname", serviceHost);
             ProblemService<Solution> stub = (ProblemService<Solution>) UnicastRemoteObject.exportObject(implementation, 0);
             Registry registry = LocateRegistry.createRegistry(SERVICE_PORT);
