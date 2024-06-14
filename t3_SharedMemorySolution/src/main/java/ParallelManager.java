@@ -7,7 +7,7 @@ public class ParallelManager {
     private KnapSack knapSack;
     private List<Book> books;
     private ForkJoinPool pool;
-    private static final int FACTOR = 2;
+    private static final int FACTOR = 1;
 
     public ParallelManager(KnapSack knapSack, List<Book> books) {
         this.knapSack = knapSack;

@@ -29,6 +29,8 @@ You will find the results in the terminal.
 
 You will find the results in the terminal.
 
+## How to run 
+
 ## How to run ServerClientSolution
 
 With in this solution you need to make sure to be able to run multiple servers of the same class in Intellij.
